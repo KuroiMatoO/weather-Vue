@@ -10,43 +10,51 @@ export default {
 	data() {
 		return {
 			locationData: null,
-			isLocationDataReady: false,
 			locChangeIsHidden: true,
 			lat: null,
 			lng: null,
 
 			weatherData: null,
-			isWeatherDataReady: false,
-			timeZoneData: null,
 			weatherData24h: [],
-			
+
+			timeZoneData: null,
 			timeData24h: [],
+
 			localCurrentHours: null,
 			localCurrentMinutes: null,
-			isTimeDataReady: false
+
+			allDataReady: false
 		}
 	},
 	computed: {
-		dataReady() {
+		locationDataReady(){
+			return this.locationData	
+		},
+		weatherAndTimeDataReady() {
 			return this.weatherData && this.timeZoneData;
 		}
 	},
 	watch: {
-		timeZoneData(){
-			this.localCurrentTime();
+		locationDataReady(newValue){
+			if (newValue){
+				this.getWeather(this.lat, this.lng);
+				this.getTimeZone(this.lat,this.lng);
+			}
 		},
-		dataReady(newValue) {
+		weatherAndTimeDataReady(newValue) {
 			if (newValue) {
+				this.localCurrentTime();
 				this.weather24h();
 				this.time24h();
+				this.allDataReady = true;
 			}
-		}
+		},
 	}, 
 	mounted() {
 		this.getLocation();
 	},
 	methods: {
-		locToggle(){
+		locToggle(){ //top right button
 			if (this.locChangeIsHidden == true){
 				this.locChangeIsHidden = false; 
 			} else {
@@ -59,9 +67,6 @@ export default {
 					this.locationData = res;
 					this.lat = res.data.latitude;
 					this.lng = res.data.longitude;
-					this.isLocationDataReady = true;
-					this.getWeather(this.lat, this.lng);
-					this.getTimeZone(this.lat,this.lng);
 					console.log("location data fetched successfully")
 					console.log(this.locationData);
 				})
@@ -73,7 +78,6 @@ export default {
 			axios.get(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,is_day,precipitation,rain,snowfall,cloud_cover,pressure_msl,wind_speed_10m&hourly=temperature_2m&daily=temperature_2m_max,sunshine_duration,temperature_2m_min,precipitation_sum,rain_sum,showers_sum,snowfall_sum&wind_speed_unit=ms&forecast_days=16&timezone=Europe%2FMoscow`)
 				.then(res => {
 					this.weatherData = res;
-					this.isWeatherDataReady = true;
 					console.log("weather data fetched successfully")
 					console.log(this.weatherData);
 				})
@@ -92,22 +96,20 @@ export default {
 					console.error("Error fetching time zone:", err);
 				});
 		},
+		localCurrentTime(){
+			this.localCurrentHours = this.timeZoneData.data.localTime.slice(11,13);
+			this.localCurrentMinutes = this.timeZoneData.data.localTime.slice(14,16);
+			console.log(`Local time: ${this.localCurrentHours}:${this.localCurrentMinutes}`);
+		},
 		weather24h(){
 			for (let i = 0; i < 24; i++){
 				this.weatherData24h[i] = this.weatherData.data.hourly.temperature_2m[parseInt(this.localCurrentHours) + i]
-				// console.log(parseInt(this.localTimeData) + i)
 			}
 		},
 		time24h(){
 			for (let i = 0; i < 24; i++){
 				this.timeData24h[i] = this.weatherData.data.hourly.time[parseInt(this.localCurrentHours) + i].slice(11,13) + ":00"
 			}	
-		},
-		localCurrentTime(){
-			this.localCurrentHours = this.timeZoneData.data.localTime.slice(11,13);
-			this.localCurrentMinutes = this.timeZoneData.data.localTime.slice(14,16);
-			console.log(this.localCurrentHours);
-			this.isTimeDataReady = true;
 		}
 	}
 }
@@ -122,14 +124,14 @@ export default {
     />
     <LocationChangeC v-if="!locChangeIsHidden" />
     <CurrentC
-      v-if="isLocationDataReady && isWeatherDataReady && isTimeDataReady"
+      v-if="allDataReady"
       :location="locationData"
       :weather="weatherData"
       :local-hour="localCurrentHours"
       :local-minute="localCurrentMinutes"
     />
     <ChartC
-      v-if="isLocationDataReady && isWeatherDataReady && isTimeDataReady"
+      v-if="allDataReady"
       :weather="weatherData24h"
       :time="timeData24h"
     />
