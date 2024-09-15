@@ -12,9 +12,9 @@ export default{
 	},
 	data() {
 		return{
-			icon: "Day.png",
-			maxTempIcon: "high_temp.svg",
-			minTempIcon: "low_temp.svg",
+			icon: "/Day.png",
+			maxTempIcon: "/high_temp.svg",
+			minTempIcon: "/low_temp.svg",
 		}
 	},
 	computed: {
