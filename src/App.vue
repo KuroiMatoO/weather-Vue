@@ -3,10 +3,10 @@ import axios from "axios"
 import LocationChangeC from "./components/LocationChangeC.vue"
 import ChartC from "./components/ChartC.vue"
 import CurrentC from "./components/CurrentC.vue"
-import WeeklyC from "./components/WeeklyC.vue"
+import DailyC from "./components/DailyC.vue"
 
 export default {
-	components: { LocationChangeC, ChartC, CurrentC, WeeklyC },
+	components: { LocationChangeC, ChartC, CurrentC, DailyC },
 	data() {
 		return {
 			locationData: null,
@@ -20,8 +20,13 @@ export default {
 			timeZoneData: null,
 			timeData24h: [],
 
-			localCurrentHours: null,
-			localCurrentMinutes: null,
+			localDateTime: null,
+			// localCurrentHours: null,
+			// localCurrentMinutes: null,
+
+			dailyTempMax: [],
+			dailyTempMin: [],
+			dailyTemp: null,
 
 			allDataReady: false
 		}
@@ -43,9 +48,10 @@ export default {
 		},
 		weatherAndTimeDataReady(newValue) {
 			if (newValue) {
-				this.localCurrentTime();
+				this.localCurrentDateTime();
 				this.weather24h();
 				this.time24h();
+				this.weatherDaily();
 				this.allDataReady = true;
 			}
 		},
@@ -96,7 +102,8 @@ export default {
 					console.error("Error fetching time zone:", err);
 				});
 		},
-		localCurrentTime(){
+		localCurrentDateTime(){
+			this.localDateTime = this.timeZoneData.data.localTime
 			this.localCurrentHours = this.timeZoneData.data.localTime.slice(11,13);
 			this.localCurrentMinutes = this.timeZoneData.data.localTime.slice(14,16);
 			console.log(`Local time: ${this.localCurrentHours}:${this.localCurrentMinutes}`);
@@ -110,6 +117,18 @@ export default {
 			for (let i = 0; i < 24; i++){
 				this.timeData24h[i] = this.weatherData.data.hourly.time[parseInt(this.localCurrentHours) + i].slice(11,13) + ":00"
 			}	
+		},
+		weatherDaily(){
+			let tempMax = [];
+			let tempMin = [];
+			for (let i = 0; i < 7; i++){
+				tempMax[i] = this.weatherData.data.daily.temperature_2m_max[i+1];
+				tempMin[i] = this.weatherData.data.daily.temperature_2m_min[i+1];
+			}
+			this.dailyTemp = {
+				tempMax: tempMax,
+				tempMin: tempMin
+			}
 		}
 	}
 }
@@ -127,15 +146,18 @@ export default {
       v-if="allDataReady"
       :location="locationData"
       :weather="weatherData"
-      :local-hour="localCurrentHours"
-      :local-minute="localCurrentMinutes"
+      :date-time="localDateTime"
     />
     <ChartC
       v-if="allDataReady"
       :weather="weatherData24h"
       :time="timeData24h"
     />
-    <WeeklyC />
+    <DailyC 
+      v-if="allDataReady"
+      :daily-temp="dailyTemp"
+      :date-time="localDateTime"
+    />
   </div>
 </template>
 

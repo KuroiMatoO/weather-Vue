@@ -9,15 +9,12 @@ export default {
 			type:Object,
 			required: true
 		},
-		localHour:{
-			type: String,
-			required: true
-		},
-		localMinute:{
+		dateTime:{
 			type: String,
 			required: true
 		}
 	},
+	
 	computed:{
 		icon(){
 			let current = this.weather.data.current;
@@ -58,7 +55,18 @@ export default {
 		wind(){
 			return this.weather.data.current.wind_speed_10m;
 		},
+		currentTime(){
+			return this.dateTime.slice(11,16);
+		},
+		currentDate(){
+			const date = new Date(this.dateTime);
+			const options = { month: "long", day: "numeric" };
+			let newDateTime = new Intl.DateTimeFormat("en-US", options).format(date);
+			return newDateTime
+		}
+		
 	}
+	
 }
 console.log("locationData")
 console.log(location)
@@ -81,10 +89,10 @@ console.log(location)
         City: <span>{{ city }}</span>
       </div>
       <div id="time">
-        Local Time: <span>{{ localHour }}: {{ localMinute }}</span>
+        Local Time: <span>{{ currentTime }}</span>
       </div>
       <div id="date">
-        <!-- {{ date }} -->
+        <span>{{ currentDate }}</span>
       </div>
     </div>
 	
