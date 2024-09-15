@@ -38,6 +38,7 @@ export default{
 }
 </script>
 
+
 <template>
   <div class="daily">
     <div
