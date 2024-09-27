@@ -1,4 +1,6 @@
 <script>
+import weatherIcons from "@/utils/weatherAssetManager";
+
 export default {
 	props: {
 		location: {
@@ -20,23 +22,23 @@ export default {
 			let current = this.weather.data.current;
 			if (current.isday) {
 				if (current.rain > 0) {
-					return "Day_rain.png"
+					return weatherIcons.DayRain
 				} else if (current.snow > 0) {
-					return "Day_snow.png"
+					return weatherIcons.DaySnow
 				} else if (current.cloud_cover >= 30 && current.precipitation == 0) {
-					return "Day_cloudy.png"
+					return weatherIcons.DayCloudy
 				} else {
-					return "Day.png"
+					return weatherIcons.Day
 				}
 			} else {
 				if (current.rain > 0 && current.precipitation > 0) {
-					return "Night_rain.png"
+					return weatherIcons.NightRain
 				} else if (current.snow > 0 && current.precipitation > 0) {
-					return "Night_snow.png"
+					return weatherIcons.NightSnow
 				} else if (current.cloud_cover >= 30 && current.precipitation == 0) {
-					return "Night_cloudy.png"
+					return weatherIcons.NightCloudy
 				} else {
-					return "Night.png"
+					return weatherIcons.Night
 				}
 			}
 		},

@@ -1,12 +1,12 @@
 <script>
 import axios from "axios"
-import LocationChangeC from "./components/LocationChangeC.vue"
-import ChartC from "./components/ChartC.vue"
-import CurrentC from "./components/CurrentC.vue"
-import DailyC from "./components/DailyC.vue"
+import LocationSearch from "./components/LocationSearch.vue"
+import Temperature_24h from "./components/Temperature_24h.vue"
+import CurrentWeatherInfo from "./components/CurrentWeatherInfo.vue"
+import WeeklyForecast from "./components/WeeklyForecast.vue"
 
 export default {
-	components: { LocationChangeC, ChartC, CurrentC, DailyC },
+	components: { LocationSearch, Temperature_24h, CurrentWeatherInfo, WeeklyForecast },
 	data() {
 		return {
 			locationData: null,
@@ -141,19 +141,19 @@ export default {
       class="location_change_button"
       @click="locToggle()"
     />
-    <LocationChangeC v-if="!locChangeIsHidden" />
-    <CurrentC
+    <LocationSearch v-if="!locChangeIsHidden" />
+    <CurrentWeatherInfo
       v-if="allDataReady"
       :location="locationData"
       :weather="weatherData"
       :date-time="localDateTime"
     />
-    <ChartC
+    <Temperature_24h
       v-if="allDataReady"
       :weather="weatherData24h"
       :time="timeData24h"
     />
-    <DailyC 
+    <WeeklyForecast 
       v-if="allDataReady"
       :daily-temp="dailyTemp"
       :date-time="localDateTime"

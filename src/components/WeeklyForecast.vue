@@ -1,4 +1,6 @@
 <script>
+import weatherIcons from "@/utils/weatherAssetManager";
+
 export default{
 	props: {
 		dailyTemp: {
@@ -12,9 +14,9 @@ export default{
 	},
 	data() {
 		return{
-			icon: "/Day.png",
-			maxTempIcon: "/high_temp.svg",
-			minTempIcon: "/low_temp.svg",
+			icon: weatherIcons.Day,
+			maxTempIcon: weatherIcons.HighTemp,
+			minTempIcon: weatherIcons.LowTemp,
 		}
 	},
 	computed: {
@@ -31,10 +33,19 @@ export default{
 				weekDates.push(newDateTime)
 				console.log(newDateTime)
 			}
-
+			
 			return weekDates;
 		}
-	}
+	},
+	mounted() {
+		this.consolelog();
+	},
+	methods: {
+		consolelog(){
+			console.log("weather icon:")
+			console.log(this.icon)
+		}
+	},
 }
 </script>
 
